@@ -60,18 +60,8 @@ function create() {
     fontSize: 16,
     color: '#ffffff'
   });
-}
-                        function update() {
-  // Calculate mana per second
-  var manaPerSecond = manaCirculationLevel * 1; // Update this formula as necessary
+});
 
-  // Update mana and manaflow
-  mana += manaPerSecond * delta;
-  mana = Math.min(mana, maxMana);
-  manaText.setText(mana + '/' + maxMana);
-  manaBar.displayWidth = (mana / maxMana) * barWidth;
-  manaflowText.setText(manaPerSecond + ' mana/s');
-  });
 var energyChannelsButton;
 var manaCirculationButton;
 var energyChannelsCost = 1;
@@ -107,37 +97,4 @@ function create() {
       energyChannelsCost += 10;
       maxMana += 10;
       manaBar.width = maxMana * 3;
-      manaText.text = 'Mana: ' + mana + '/' + maxMana;
-      energyChannelsButton.text = 'Open energy channels (' + energyChannelsCost + ')';
-    }
-  });
-
-  manaCirculationButton.setInteractive();
-  manaCirculationButton.on('pointerdown', function() {
-    if (mana >= manaCirculationCost) {
-      mana -= manaCirculationCost;
-      manaCirculationCost *= 2;
-      manaPerSecond += 1;
-      manaText.text = 'Mana: ' + mana + '/' + maxMana;
-      manaCirculationButton.text = 'Mana circulation (' + manaCirculationCost + ')';
-    }
-  });
-
-  // ...
-}
-
-function update() {
-  // Add mana per second from mana circulation
-  if (manaPerSecond > 0) {
-    mana += manaPerSecond;
-    if (mana > maxMana) {
-      mana = maxMana;
-    }
-    manaText.text = 'Mana: ' + mana + '/' + maxMana;
-  }
-}
-
-
-function update () {
-    // Define game logic and update game state here
-}
+      manaText.text = 'Mana: ' + mana + '/' + max
