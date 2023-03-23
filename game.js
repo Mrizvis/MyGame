@@ -10,91 +10,96 @@ var config = {
 };
 
 var game = new Phaser.Game(config);
+var maxMana = 100;
+var mana = 0;
+var manaText;
+var EBcost = 5;
+var MPSBcost = 5;
+var energychannelsButton;
+var mpsButton;
+var mps = 0; // current mana per second
+var mpsText; // text to display current mana per second
+var mpsInterval; // setInterval ID for the mana per second function
 
-function preload() {
-  // Background
-  this.load.image('background', 'assets/images/background.png');
+function preload () {
+    // Load game assets here
+this.load.image('background', 'assets/images/background.png');
 }
 
-function create() {
+function create () {
+    // Set up game objects and state here
     // Add background image
-    var bg = this.add.image(0, 0, 'background').setOrigin(0, 0);
-
-    // Resize background image to fit game canvas
-    bg.displayWidth = this.sys.game.config.width;
-    bg.displayHeight = this.sys.game.config.height;
-
-  // Add mana bar
-  var bar = this.add.graphics();
-  var barWidth = 200;
-  var barHeight = 20;
-  var barX = 10;
-  var barY = 10;
-  var barBorderSize = 4;
-  var barBorderColor = 0xFFFFFF;
-  var barColor = 0x0000FF;
-  var mana = 0;
-  var manaText = this.add.text(barX + barWidth/2, barY + barHeight/2, '0/100', { fontFamily: 'Arial', fontSize: 16, color: '#FFFFFF' }).setOrigin(0.5);
-
-  function updateBar() {
-    bar.clear();
-    bar.lineStyle(barBorderSize, barBorderColor, 1);
-    bar.fillStyle(barColor, 1);
-    bar.fillRect(barX, barY, barWidth * (mana/100), barHeight);
-    manaText.setText(mana + '/100');
-  }
-
-  updateBar();
-
-  // Increase mana button
-  var increaseManaButton = this.add.text(400, 100, 'Increase Mana', { fontFamily: 'Arial', fontSize: 24, color: '#FFFFFF' });
-  increaseManaButton.setInteractive();
-  increaseManaButton.on('pointerdown', function() {
-    if (mana < 100) {
-      mana += 10;
-      updateBar();
+    this.add.image(0, 0, 'background').setOrigin(0.5, 0.5);
+    
+    // Add mana text
+    manaText = this.add.text(10, 10, 'Mana: 0/100', { fontSize: '24px', fill: '#fff' });
+    // Add mps text
+mpsText = this.add.text(10, 40, 'MPS: 0', { fontSize: '24px', fill: '#fff' });
+    // Add meditate button, plus mana
+    var meditateButton = this.add.text(250, 10, 'Meditate', { fontSize: '24px', fill: '#fff', backgroundColor: '#000' });
+    meditateButton.setInteractive();
+    meditateButton.on('pointerdown', function () {
+        mana += 1;
+    });
+// Add energy channels button, plus max mana
+    energychannelsButton = this.add.text(250, 40, 'Open energy channels /('+ EBcost +')', { fontSize: '24px', fill: '#fff', backgroundColor: '#000' });
+    energychannelsButton.setInteractive();
+    energychannelsButton.on('pointerdown', function () { 
+    if (mana >= EBcost) {
+        maxMana += 10;
+        mana -= EBcost;
+        EBcost += 5;
+        updateEBCostText();
     }
-      // Add manaflow text
-  var manaflowText = this.add.text(10, 70, '0 mana/s', {
-    fontFamily: 'Arial',
-    fontSize: 16,
-    color: '#ffffff'
-  });
+    // call updateEBCostText() here to update the button text
+    updateEBCostText();
+});
+// Add mana per second button, plus mps
+mpsButton = this.add.text(250, 70, 'Circulate mana /('+ MPSBcost +')', { fontSize: '24px', fill: '#fff', backgroundColor: '#000' });
+mpsButton.setInteractive();
+mpsButton.on('pointerdown', function () { 
+    if (mana >= MPSBcost) {
+        mps += 1;
+        mana -= MPSBcost;
+        MPSBcost += 5;
+        updateMPSBcostText();
+        updateMPS();
+    }
 });
 
-var energyChannelsButton;
-var manaCirculationButton;
-var energyChannelsCost = 1;
-var manaCirculationCost = 1;
-var manaPerSecond = 0;
+}
 
-function create() {
-  // Add buttons
-  energyChannelsButton = this.add.text(100, 300, 'Open energy channels', {
-    fontSize: '32px',
-    fill: '#ffffff',
-    backgroundColor: '#008CBA',
-    padding: {
-      x: 20,
-      y: 10
-    }
-  });
-  manaCirculationButton = this.add.text(100, 400, 'Mana circulation', {
-    fontSize: '32px',
-    fill: '#ffffff',
-    backgroundColor: '#008CBA',
-    padding: {
-      x: 20,
-      y: 10
-    }
-  });
+function update () {
+    // Define game logic and update game state here
+    
+    // Update mana text
+    manaText.setText('Mana: '+ mana +' / '+ maxMana +'');
+// Update mps text
+    mana += mps;
+    updateMPS();
+}
+function updateEBCostText() {
+    // Update the text of the increase max mana button to show the current cost
+    energychannelsButton.setText('Open energy channels /(' + EBcost  + ')');
+}
+function updateMPSBcostText() {
+    // Update the text of the increase max mana button to show the current cost
+    mpsButton.setText('Circulate mana /('+ MPSBcost + ')');
+}
+function updateMPS() {
+    // Update the text of the mps text to show the current mana per second
+    mpsText.setText('MPS: ' + mps);
+}
+function startMPSInterval() {
+    mpsInterval = setInterval(function() {
+        if (mana < maxMana) {
+            mana += mps;
+            if (mana > maxMana) {
+                mana = maxMana;
+            }
+        }
+    }, 100000000);
+}
 
-  // Add button events
-  energyChannelsButton.setInteractive();
-  energyChannelsButton.on('pointerdown', function() {
-    if (mana >= energyChannelsCost) {
-      mana -= energyChannelsCost;
-      energyChannelsCost += 10;
-      maxMana += 10;
-      manaBar.width = maxMana * 3;
-      manaText.text = 'Mana: ' + mana + '/' + max
+startMPSInterval();
+
